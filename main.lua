@@ -5,7 +5,7 @@ Class = require "Class"
 
 Paddle = Class{}
 Ball = Class{}
---change
+--------------------------------------------------Paddle Creation--------------------------------------------------
 function Paddle:init(x,y,width,height)
     self.x = x
     self.y = y
@@ -13,7 +13,7 @@ function Paddle:init(x,y,width,height)
     self.height = height
     self.speed = 200
 end
-
+--------------------------------------------------Ball creation---------------------------------------------------
 function Ball:init(x,y,width,height)
     self.x = x
     self.y = y
@@ -22,38 +22,43 @@ function Ball:init(x,y,width,height)
     self.xspeed = 0
     self.yspeed = 0
 end
-
+--------------------------------------------Draw Function for Paddles--------------------------------------------
 function Paddle:draw()
     love.graphics.rectangle("fill",self.x,self.y,self.width,self.height)
 end
-
+----------------------------------------------Draw Function for Ball---------------------------------------------
 function Ball:draw()
     love.graphics.draw(ball_image,self.x,self.y,0,0.018,0.018)
 end
-
+--------------------------------------------Update Function for Ball---------------------------------------------
 function Ball:update(dt)
     self.x=self.x+self.xspeed*dt
     self.y=self.y+self.yspeed*dt
     if self.y<0 then
         ball.yspeed=-ball.yspeed
+        -------------------------------------------To prevent Glitches-------------------------------------------
         self.y=0
         tok:play()
     end
     if self.y>window_height-self.height then
         ball.yspeed=-ball.yspeed
+        -------------------------------------------To prevent Glitches-------------------------------------------
         self.y=window_height-self.height
         tok:play()
     end
     if collision(ball,left_paddle)then
         ball.xspeed=-ball.xspeed*1.1
+        -------------------------------------------To prevent Glitches-------------------------------------------
         ball.x=left_paddle.width
         tik:play()
     end
     if collision(ball,right_paddle)then
         ball.xspeed=-ball.xspeed*1.1
+        -------------------------------------------To prevent Glitches-------------------------------------------
         ball.x=window_width-right_paddle.width-ball.width
         tik:play()
     end
+    ---------------------------------------------------Scoring---------------------------------------------------
     if (self.x>window_width)then
         player1_score=player1_score+1
         self.x=window_width/2-self.width/2      
@@ -78,17 +83,18 @@ function Ball:update(dt)
         end
     end
 end
-
+----------------------------------------------------Collision----------------------------------------------------
 function collision(k,v)
     return k.x+k.width>v.x and
            k.x<v.x+v.width and
            k.y+k.height>v.y and
            k.y<v.y+v.height
 end
-
+--------------------------------------------------Space to Play--------------------------------------------------
 function love.keypressed(key)
     if key=="space" and state=="steady" then
         state="play"
+        --------------------------------Randomizing initial direction of the Ball--------------------------------
         if math.random(1,2)==1 then
             ball.xspeed=math.random(250,450)
         else
@@ -101,7 +107,7 @@ function love.keypressed(key)
         end
     end
 end
-
+-----------------------------------------------Love.load function-----------------------------------------------
 function love.load ()
     math.randomseed=(os.time())
     love.window.setMode(window_width,window_height)
@@ -118,7 +124,7 @@ function love.load ()
     tok=love.audio.newSource('Audio/Tok.mp3','static')
     Music=love.audio.newSource('Audio/Music.mp3',"stream")
 end
-
+-----------------------------------------------Love.update Function-----------------------------------------------
 function love.update (dt)
     if love.keyboard.isDown('w')then
         left_paddle.y=math.max(0,left_paddle.y-left_paddle.speed*dt)
@@ -132,11 +138,12 @@ function love.update (dt)
     if love.keyboard.isDown('down')then
         right_paddle.y=math.min(window_height-right_paddle.height,right_paddle.y+right_paddle.speed*dt)
     end
+    ----------------------------------calling update function of the Ball-----------------------------------------
     ball:update(dt)
     Music:play()
     Music:setLooping(true)
 end
-
+------------------------------------------------Love.draw function------------------------------------------------
 function love.draw ()
     love.graphics.draw(Background,0,0,0,0.5,0.5)
     if state=="steady"then
