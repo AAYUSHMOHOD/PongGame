@@ -92,7 +92,11 @@ function collision(k,v)
 end
 --------------------------------------------------Space to Play--------------------------------------------------
 function love.keypressed(key)
-    if key=="space" and state=="steady" then
+    if key=="space" and state=="player1_win" then
+        state="Home"
+    elseif key=="space" and state=="player2_win" then
+        state="Home"
+    elseif key=="space" and state=="Home" then
         state="play"
         --------------------------------Randomizing initial direction of the Ball--------------------------------
         if math.random(1,2)==1 then
@@ -117,7 +121,7 @@ function love.load ()
     player1_score=0
     player2_score=0
     turn=1
-    state="steady"
+    state="Home"
     Background=love.graphics.newImage('Images/bg.jpg')
     ball_image=love.graphics.newImage('Images/ball.png')
     tik=love.audio.newSource('Audio/Tik.mp3','static')
@@ -142,11 +146,26 @@ function love.update (dt)
     ball:update(dt)
     Music:play()
     Music:setLooping(true)
+    if player1_score==2 then
+        state="player1_win"
+        ball = Ball(window_width/2-5,window_height/2-5,10,10)
+        left_paddle = Paddle(0,window_height/2-100/2,20,100)
+        right_paddle = Paddle(window_width-20, window_height/2-100/2,20,100)
+        player1_score=0
+        player2_score=0
+    elseif player2_score==2 then
+        state="player2_win"
+        ball = Ball(window_width/2-5,window_height/2-5,10,10)
+        left_paddle = Paddle(0,window_height/2-100/2,20,100)
+        right_paddle = Paddle(window_width-20, window_height/2-100/2,20,100)
+        player1_score=0
+        player2_score=0
+    end
 end
 ------------------------------------------------Love.draw function------------------------------------------------
 function love.draw ()
     love.graphics.draw(Background,0,0,0,0.5,0.5)
-    if state=="steady"then
+    if state=="Home"then
         love.graphics.setFont(love.graphics.newFont(30))
         love.graphics.setColor(0,1,0)
         love.graphics.printf("press space to start the game",0,window_height/2+100,window_width,"center")
@@ -156,7 +175,7 @@ function love.draw ()
         right_paddle:draw()
         love.graphics.setColor(1,1,1)
         ball:draw()
-    else
+    elseif state=="play"then
         love.graphics.setColor(0,0,1)
         left_paddle:draw()
         love.graphics.setColor(1,0,0)
@@ -168,5 +187,27 @@ function love.draw ()
         love.graphics.printf(tostring(player1_score),200,100,100,"center")
         love.graphics.printf(tostring(player2_score),1000,100,100,"center")
         love.graphics.setColor(1,1,1)
+    elseif state=="player1_win" then
+        love.graphics.setFont(love.graphics.newFont(30))
+        love.graphics.setColor(0,1,0)
+        love.graphics.printf("Player 1 Wins",0,window_height/2+70,window_width,"center")
+        love.graphics.printf("press space to proceed to the home screen",0,window_height/2+100,window_width,"center")
+        love.graphics.setColor(0,0,1)
+        left_paddle:draw()
+        love.graphics.setColor(1,0,0)
+        right_paddle:draw()
+        love.graphics.setColor(1,1,1)
+        ball:draw()
+    elseif state=="player2_win" then
+        love.graphics.setFont(love.graphics.newFont(30))
+        love.graphics.setColor(0,1,0)
+        love.graphics.printf("Player 2 Wins",0,window_height/2+70,window_width,"center")
+        love.graphics.printf("press space to proceed to the home screen",0,window_height/2+100,window_width,"center")
+        love.graphics.setColor(0,0,1)
+        left_paddle:draw()
+        love.graphics.setColor(1,0,0)
+        right_paddle:draw()
+        love.graphics.setColor(1,1,1)
+        ball:draw()
     end
 end
